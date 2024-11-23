@@ -36,15 +36,18 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -f -y && \
     rm -f google-chrome-stable_current_amd64.deb
 
-# Pastikan lokasi binary Google Chrome
+# Periksa lokasi dan buat symlink jika diperlukan
 RUN if [ -f "/usr/bin/google-chrome-stable" ]; then \
         ln -s /usr/bin/google-chrome-stable /usr/bin/google-chrome; \
     elif [ -f "/opt/google/chrome/google-chrome" ]; then \
         ln -s /opt/google/chrome/google-chrome /usr/bin/google-chrome; \
+    else \
+        echo "Google Chrome not found! Check installation steps."; \
+        exit 1; \
     fi
 
-# Verifikasi pemasangan Google Chrome
-RUN which google-chrome && google-chrome --version
+# Debugging: Tampilkan lokasi dan versi Google Chrome
+RUN ls -l /usr/bin/google-chrome* && google-chrome --version
 
 # Bersihkan cache APT untuk mengurangi ukuran image
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
