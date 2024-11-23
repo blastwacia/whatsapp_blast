@@ -17,7 +17,7 @@ app = Flask(__name__)
 # Konfigurasi WebDriver
 def create_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    #chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     service = Service(executable_path='/path/to/chromedriver')  # Sesuaikan dengan path di server
