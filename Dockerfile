@@ -1,7 +1,10 @@
 # Gunakan image dasar Ubuntu
 FROM ubuntu:20.04
 
-# Install dependensi dan alat untuk mengunduh dan menginstal Google Chrome
+# Set zona waktu secara non-interaktif
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependensi yang diperlukan dan alat pendukung
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -21,11 +24,29 @@ RUN apt-get update && apt-get install -y \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
+    tzdata \
     && rm -rf /var/lib/apt/lists/*
+
+# Set zona waktu default ke Asia/Jakarta (ubah sesuai kebutuhan)
+RUN ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
 
 # Download dan install Google Chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -f -y
+    dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -f -y && \
+    rm -f google-chrome-stable_current_amd64.deb
 
 # Verifikasi pemasangan Google Chrome
-RUN google-chrome-stable --version
+RUN google-chrome --version
+
+# Bersihkan cache APT untuk mengurangi ukuran image
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Tambahkan file aplikasi Anda ke dalam kontainer (opsional)
+# COPY . /app
+
+# Jalankan perintah default (opsional)
+CMD ["bash"]
