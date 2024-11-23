@@ -1,7 +1,7 @@
 # Gunakan image dasar Ubuntu
 FROM ubuntu:20.04
 
-# Set zona waktu secara non-interaktif
+# Set zona waktu non-interaktif
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependensi yang diperlukan
@@ -36,21 +36,18 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -f -y && \
     rm -f google-chrome-stable_current_amd64.deb
 
-# Pastikan instalasi berhasil dengan menampilkan file terkait Chrome
-RUN find / -name "google-chrome*" || echo "Google Chrome not found!"
-
-# Periksa lokasi dan buat symlink jika diperlukan
+# Periksa lokasi instalasi Google Chrome
 RUN if [ -f "/usr/bin/google-chrome-stable" ]; then \
         ln -s /usr/bin/google-chrome-stable /usr/bin/google-chrome; \
     elif [ -f "/opt/google/chrome/google-chrome" ]; then \
         ln -s /opt/google/chrome/google-chrome /usr/bin/google-chrome; \
     else \
-        echo "Google Chrome binary not found. Please check installation steps."; \
-        exit 1; \
+        echo "Google Chrome binary not found. Checking alternative paths..."; \
+        find / -name "google-chrome*" || exit 1; \
     fi
 
 # Debugging: Tampilkan lokasi dan versi Google Chrome
-RUN ls -l /usr/bin/google-chrome* && google-chrome --version
+RUN which google-chrome && google-chrome --version
 
 # Bersihkan cache APT untuk mengurangi ukuran image
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
