@@ -33,17 +33,15 @@ RUN ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
 
 # Download dan install Google Chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -f -y && \
+    apt-get update && apt-get install -f -y ./google-chrome-stable_current_amd64.deb && \
     rm -f google-chrome-stable_current_amd64.deb
 
 # Periksa lokasi instalasi Google Chrome
-RUN if [ -f "/usr/bin/google-chrome-stable" ]; then \
-        ln -s /usr/bin/google-chrome-stable /usr/bin/google-chrome; \
-    elif [ -f "/opt/google/chrome/google-chrome" ]; then \
-        ln -s /opt/google/chrome/google-chrome /usr/bin/google-chrome; \
+RUN GOOGLE_CHROME_PATH=$(find /usr /opt -name "google-chrome*" -type f -executable | head -n 1) && \
+    if [ -n "$GOOGLE_CHROME_PATH" ]; then \
+        ln -sf "$GOOGLE_CHROME_PATH" /usr/bin/google-chrome; \
     else \
-        echo "Google Chrome binary not found. Checking alternative paths..."; \
-        find / -name "google-chrome*" || exit 1; \
+        echo "Google Chrome binary not found. Installation might have failed." && exit 1; \
     fi
 
 # Debugging: Tampilkan lokasi dan versi Google Chrome
