@@ -36,13 +36,16 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -f -y && \
     rm -f google-chrome-stable_current_amd64.deb
 
+# Pastikan instalasi berhasil dengan menampilkan file terkait Chrome
+RUN find / -name "google-chrome*" || echo "Google Chrome not found!"
+
 # Periksa lokasi dan buat symlink jika diperlukan
 RUN if [ -f "/usr/bin/google-chrome-stable" ]; then \
         ln -s /usr/bin/google-chrome-stable /usr/bin/google-chrome; \
     elif [ -f "/opt/google/chrome/google-chrome" ]; then \
         ln -s /opt/google/chrome/google-chrome /usr/bin/google-chrome; \
     else \
-        echo "Google Chrome not found! Check installation steps."; \
+        echo "Google Chrome binary not found. Please check installation steps."; \
         exit 1; \
     fi
 
