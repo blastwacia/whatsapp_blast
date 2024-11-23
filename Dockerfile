@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y \
     tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-# Set zona waktu default ke Asia/Jakarta (ubah sesuai kebutuhan)
+# Set zona waktu default ke Asia/Jakarta
 RUN ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
 
@@ -35,6 +35,9 @@ RUN ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
     dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -f -y && \
     rm -f google-chrome-stable_current_amd64.deb
+
+# Link binary Chrome secara eksplisit
+RUN ln -s /usr/bin/google-chrome-stable /usr/bin/google-chrome
 
 # Verifikasi pemasangan Google Chrome
 RUN google-chrome --version
