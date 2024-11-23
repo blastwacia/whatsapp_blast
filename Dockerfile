@@ -4,7 +4,7 @@ FROM ubuntu:20.04
 # Set zona waktu secara non-interaktif
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependensi yang diperlukan dan alat pendukung
+# Install dependensi yang diperlukan
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -36,11 +36,15 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -f -y && \
     rm -f google-chrome-stable_current_amd64.deb
 
-# Link binary Chrome secara eksplisit
-RUN ln -s /usr/bin/google-chrome-stable /usr/bin/google-chrome
+# Pastikan lokasi binary Google Chrome
+RUN if [ -f "/usr/bin/google-chrome-stable" ]; then \
+        ln -s /usr/bin/google-chrome-stable /usr/bin/google-chrome; \
+    elif [ -f "/opt/google/chrome/google-chrome" ]; then \
+        ln -s /opt/google/chrome/google-chrome /usr/bin/google-chrome; \
+    fi
 
 # Verifikasi pemasangan Google Chrome
-RUN google-chrome --version
+RUN which google-chrome && google-chrome --version
 
 # Bersihkan cache APT untuk mengurangi ukuran image
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
