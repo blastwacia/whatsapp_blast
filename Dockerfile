@@ -43,5 +43,7 @@ CMD ["python", "app.py"]
 
 # Expose port untuk aplikasi
 EXPOSE 5000
+
+# Gunakan Gunicorn untuk menjalankan aplikasi Flask dan pastikan mendengarkan pada port yang benar
 CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:$PORT", "app:app"]
 
