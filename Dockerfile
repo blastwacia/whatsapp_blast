@@ -1,15 +1,11 @@
 # Gunakan image Python versi 3.10
 FROM python:3.10-slim
 
-# Instal dependensi sistem yang diperlukan untuk membangun numpy
+# Instal dependensi sistem yang diperlukan
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libatlas-base-dev \
-    gfortran \
-    gcc \
     wget \
     unzip \
-    libglib2.0-0 && \  # Menambahkan libglib yang hilang
+    libglib2.0-0 && \
     rm -rf /var/lib/apt/lists/*
 
 # Install ChromeDriver
