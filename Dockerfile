@@ -1,5 +1,5 @@
-# Gunakan image Python resmi
-FROM python:3.11-slim
+# Gunakan image Python versi 3.10
+FROM python:3.10-slim
 
 # Instal dependensi sistem yang diperlukan untuk membangun numpy
 RUN apt-get update && apt-get install -y \
