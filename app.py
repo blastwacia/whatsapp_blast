@@ -116,5 +116,7 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 10000))  # Render memberikan port melalui variabel lingkungan
-    app.run(host='0.0.0.0', port=port)  # Mengikat ke 0.0.0.0 agar bisa diakses dari luar
+    # Mendapatkan port dari variabel lingkungan PORT, atau menggunakan 5000 jika tidak ada
+    port = int(os.environ.get('PORT', 5000))  # default ke 5000 jika PORT tidak tersedia
+    # Jalankan server di host 0.0.0.0 dan port yang sesuai
+    app.run(host='0.0.0.0', port=port)
