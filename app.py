@@ -115,7 +115,6 @@ if __name__ == "__main__":
         os.mkdir("uploads")
     app.run(debug=True)
 
-port = int(os.environ.get("PORT", 5000))
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=port)
+    port = int(os.environ.get('PORT', 10000))  # Render memberikan port melalui variabel lingkungan
+    app.run(host='0.0.0.0', port=port)  # Mengikat ke 0.0.0.0 agar bisa diakses dari luar
