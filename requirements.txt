@@ -1,6 +1,6 @@
 selenium==4.0.0
-pandas==1.3.3
-flask==2.0.2  # jika Anda menggunakan Flask untuk aplikasi web
+pandas==1.5.3
+flask==2.2.2  # jika Anda menggunakan Flask untuk aplikasi web
 numpy==1.21.6
 pip>=24.0
 setuptools>=60.0
