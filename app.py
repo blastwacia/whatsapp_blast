@@ -116,7 +116,5 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 if __name__ == "__main__":
-    # Mendapatkan port dari variabel lingkungan PORT, atau menggunakan 5000 jika tidak ada
-    port = int(os.environ.get('PORT', 5000))  # default ke 5000 jika PORT tidak tersedia
-    # Jalankan server di host 0.0.0.0 dan port yang sesuai
-    app.run(host='0.0.0.0', port=port)
+    port = os.environ.get('PORT', 5000)  # Menggunakan 5000 jika PORT tidak ada
+    app.run(host='0.0.0.0', port=int(port))  # Mengonversi ke integer dan menggunakan port yang tepat
