@@ -32,8 +32,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Salin kode aplikasi lainnya ke dalam container
 COPY . /app/
 
-# Tentukan perintah untuk menjalankan aplikasi dengan Gunicorn
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:$PORT", "app:app"]
+# Menjalankan aplikasi dengan Gunicorn pada port yang ditentukan oleh variabel lingkungan PORT
+CMD ["sh", "-c", "gunicorn -w 4 -b 0.0.0.0:$PORT app:app"]
 
 # Menyatakan bahwa container mendengarkan pada port 5000
 EXPOSE 5000
