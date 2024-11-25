@@ -15,6 +15,9 @@ WORKDIR /app
 # Salin file requirements.txt ke dalam container
 COPY requirements.txt /app/
 
+# Perbarui pip, setuptools, dan wheel
+RUN pip install --upgrade pip setuptools wheel
+
 # Instal dependensi Python
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -23,6 +26,3 @@ COPY . /app/
 
 # Tentukan perintah untuk menjalankan aplikasi
 CMD ["python", "app.py"]
-
-# Perbarui pip, setuptools, dan wheel
-RUN pip install --upgrade pip setuptools wheel
