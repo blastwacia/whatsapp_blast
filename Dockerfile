@@ -43,3 +43,5 @@ CMD ["python", "app.py"]
 
 # Expose port untuk aplikasi
 EXPOSE 5000
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:$PORT", "app:app"]
+
