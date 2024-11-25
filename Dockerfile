@@ -1,7 +1,7 @@
 # Gunakan image Python versi 3.10-slim
 FROM python:3.10-slim
 
-# Instal dependensi sistem yang diperlukan untuk membangun numpy dan ChromeDriver
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libatlas-base-dev \
@@ -37,3 +37,5 @@ CMD ["sh", "-c", "gunicorn -w 4 -b 0.0.0.0:$PORT app:app"]
 
 # Menyatakan bahwa container mendengarkan pada port 5000
 EXPOSE 5000
+
+RUN chromedriver --version
