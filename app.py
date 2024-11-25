@@ -119,3 +119,9 @@ if __name__ == "__main__":
     port = os.environ.get('PORT', 5000)
     print(f"Using port: {port}")  # Debugging output untuk melihat nilai port
     app.run(host='0.0.0.0', port=int(port))  # Konversikan port ke integer dan jalankan aplikasi
+
+# Gunakan PORT yang disediakan oleh lingkungan, atau gunakan 5000 sebagai fallback
+    port = int(os.getenv("PORT", 5000))
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=port)
