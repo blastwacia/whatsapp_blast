@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 # Setel direktori kerja di dalam container
 WORKDIR /app
 
-# Salin file requirements ke dalam container
+# Salin file requirements.txt ke dalam container
 COPY requirements.txt /app/
 
 # Instal dependensi Python
