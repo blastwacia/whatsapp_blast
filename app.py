@@ -116,5 +116,6 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 if __name__ == "__main__":
-    port = os.environ.get('PORT', 5000)  # Menggunakan 5000 jika PORT tidak ada
-    app.run(host='0.0.0.0', port=int(port))  # Mengonversi ke integer dan menggunakan port yang tepat
+    port = os.environ.get('PORT', 5000)
+    print(f"Using port: {port}")  # Debugging output untuk melihat nilai port
+    app.run(host='0.0.0.0', port=int(port))  # Konversikan port ke integer dan jalankan aplikasi
