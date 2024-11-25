@@ -26,3 +26,6 @@ COPY . /app/
 
 # Tentukan perintah untuk menjalankan aplikasi
 CMD ["python", "app.py"]
+
+docker build --no-cache -t my-app .
+
