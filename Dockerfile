@@ -26,3 +26,5 @@ COPY . /app/
 
 # Tentukan perintah untuk menjalankan aplikasi
 CMD ["python", "app.py"]
+
+EXPOSE 5000
