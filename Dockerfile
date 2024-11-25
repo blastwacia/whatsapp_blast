@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     gcc \
     wget \
     unzip \
+    libglib2.0-0 \  # Menambahkan libglib yang hilang
     && rm -rf /var/lib/apt/lists/*
 
 # Install ChromeDriver
@@ -16,6 +17,10 @@ RUN wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_
     && unzip /tmp/chromedriver.zip -d /usr/local/bin/ \
     && chmod +x /usr/local/bin/chromedriver \
     && rm /tmp/chromedriver.zip
+
+# Memverifikasi instalasi ChromeDriver
+RUN chromedriver --version
+
 
 # Setel direktori kerja di dalam container
 WORKDIR /app
@@ -37,5 +42,3 @@ CMD ["sh", "-c", "gunicorn -w 4 -b 0.0.0.0:$PORT app:app"]
 
 # Menyatakan bahwa container mendengarkan pada port 5000
 EXPOSE 5000
-
-RUN chromedriver --version
