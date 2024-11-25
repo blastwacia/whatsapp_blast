@@ -1,7 +1,7 @@
-# Gunakan image Python versi 3.10-slim
+# Gunakan image Python versi 3.10
 FROM python:3.10-slim
 
-# Install dependencies
+# Instal dependensi sistem yang diperlukan untuk membangun numpy
 RUN apt-get update && apt-get install -y \
     build-essential \
     libatlas-base-dev \
@@ -9,8 +9,8 @@ RUN apt-get update && apt-get install -y \
     gcc \
     wget \
     unzip \
-    libglib2.0-0 \  # Menambahkan libglib yang hilang
-    && rm -rf /var/lib/apt/lists/*
+    libglib2.0-0 && \  # Menambahkan libglib yang hilang
+    rm -rf /var/lib/apt/lists/*
 
 # Install ChromeDriver
 RUN wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip -O /tmp/chromedriver.zip \
@@ -20,7 +20,6 @@ RUN wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_
 
 # Memverifikasi instalasi ChromeDriver
 RUN chromedriver --version
-
 
 # Setel direktori kerja di dalam container
 WORKDIR /app
@@ -37,8 +36,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Salin kode aplikasi lainnya ke dalam container
 COPY . /app/
 
-# Menjalankan aplikasi dengan Gunicorn pada port yang ditentukan oleh variabel lingkungan PORT
-CMD ["sh", "-c", "gunicorn -w 4 -b 0.0.0.0:$PORT app:app"]
+# Tentukan perintah untuk menjalankan aplikasi
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:$PORT", "app:app"]
 
-# Menyatakan bahwa container mendengarkan pada port 5000
 EXPOSE 5000
