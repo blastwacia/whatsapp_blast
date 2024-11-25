@@ -120,8 +120,9 @@ if __name__ == "__main__":
     print(f"Using port: {port}")  # Debugging output untuk melihat nilai port
     app.run(host='0.0.0.0', port=int(port))  # Konversikan port ke integer dan jalankan aplikasi
 
-# Gunakan PORT yang disediakan oleh lingkungan, atau gunakan 5000 sebagai fallback
+# Menampilkan port yang digunakan pada log
     port = int(os.getenv("PORT", 5000))
+    app.logger.info(f"Using port {port} for Flask app")
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=port)
