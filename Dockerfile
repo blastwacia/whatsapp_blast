@@ -23,3 +23,6 @@ COPY . /app/
 
 # Tentukan perintah untuk menjalankan aplikasi
 CMD ["python", "app.py"]
+
+# Perbarui pip, setuptools, dan wheel
+RUN pip install --upgrade pip setuptools wheel
