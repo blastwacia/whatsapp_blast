@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WhatsApp Blast</title>
+</head>
+<body>
+    <h1>WhatsApp Blast Tool</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="file">Upload CSV File:</label>
+        <input type="file" id="file" name="file" required>
+        <button type="submit">Upload</button>
+    </form>
+    <br>
+    <textarea id="message" placeholder="Enter your message..."></textarea>
+    <button id="startButton">Start Blasting</button>
+    <br>
+    <div id="status"></div>
+
+    <script>
+        document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append("file", document.getElementById("file").files[0]);
+            const response = await fetch("/upload", {
+                method: "POST",
+                body: formData,
+            });
+            const result = await response.json();
+            document.getElementById("status").innerText = result.message;
+        });
+
+        document.getElementById("startButton").addEventListener("click", async () => {
+            const message = document.getElementById("message").value;
+            const response = await fetch("/start", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message }),
+            });
+            const result = await response.json();
+            document.getElementById("status").innerText = result.message;
+        });
+    </script>
+</body>
+</html>
