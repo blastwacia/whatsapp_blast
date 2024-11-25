@@ -35,3 +35,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Tentukan perintah yang akan dijalankan saat container mulai
 CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:$PORT", "app:app"]
 
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Gunakan Gunicorn untuk menjalankan aplikasi Flask
+CMD ["sh", "-c", "gunicorn -w 4 -b 0.0.0.0:$PORT app:app"]
+
+
