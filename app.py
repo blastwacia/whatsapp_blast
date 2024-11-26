@@ -22,14 +22,18 @@ failed_numbers = []
 last_sent_index = 0
 driver = None
 
+# Create uploads directory if not exists
+if not os.path.exists("uploads"):
+    os.mkdir("uploads")
+
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template("index.html")  # Pastikan `index.html` ada di folder templates
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
     global file_path
-    file = request.files['file']
+    file = request.files.get('file')
     if file:
         file_path = os.path.join("uploads", file.filename)
         file.save(file_path)
@@ -48,12 +52,12 @@ def start_blasting():
     if not message_template:
         return jsonify({"status": "error", "message": "Message cannot be empty."})
 
-    # Initialize WebDriver
     try:
+        # Initialize WebDriver
         chrome_options = Options()
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--headless")  # Run in headless mode for Heroku
+        chrome_options.add_argument("--headless")
         service = Service(executable_path="chromedriver")
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
@@ -65,7 +69,6 @@ def start_blasting():
         data = pd.read_csv(file_path, dtype={"NO HANDPHONE": str}).dropna(subset=["NO HANDPHONE"])
         data["NO HANDPHONE"] = data["NO HANDPHONE"].apply(lambda x: x.strip())
 
-        total_numbers = len(data)
         for index, row in data.iloc[last_sent_index:].iterrows():
             nomor = row["NO HANDPHONE"]
             if not is_valid_number(nomor):
@@ -85,7 +88,7 @@ def start_blasting():
                 tombol_kirim.click()
                 sent_numbers.append(nomor)
                 last_sent_index += 1
-            except Exception as e:
+            except Exception:
                 failed_numbers.append(nomor)
 
             sleep(randint(90, 180))
@@ -110,7 +113,6 @@ def is_valid_number(nomor):
     pattern = r'^\+62\d{8,15}$'
     return re.match(pattern, nomor) is not None
 
-if __name__ == "__main__":
-    if not os.path.exists("uploads"):
-        os.mkdir("uploads")
-    app.run(debug=True)
+if __name__ == '__main__':
+    port = int(os.getenv("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
