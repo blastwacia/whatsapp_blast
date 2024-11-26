@@ -12,45 +12,70 @@ import urllib.parse
 from time import sleep
 from random import randint
 import re
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-# Global variables
-file_path = None
+# Folder Upload
+UPLOAD_FOLDER = "uploads"
+ALLOWED_EXTENSIONS = {"csv"}
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+if not os.path.exists(UPLOAD_FOLDER):
+    os.mkdir(UPLOAD_FOLDER)
+
+# Global Variables (Session-safe)
 sent_numbers = []
 failed_numbers = []
 last_sent_index = 0
 driver = None
 
-# Create uploads directory if not exists
-if not os.path.exists("uploads"):
-    os.mkdir("uploads")
+# Helpers
+def allowed_file(filename):
+    """Check if the file is a valid CSV."""
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/')
+def is_valid_number(nomor):
+    """Check if the phone number is valid."""
+    pattern = r'^\+62\d{8,15}$'
+    return re.match(pattern, nomor) is not None
+
+# Routes
+@app.route("/")
 def index():
-    return render_template("index.html")  # Pastikan `index.html` ada di folder templates
+    return render_template("index.html")  # Ensure index.html exists in templates folder
 
-@app.route('/upload', methods=['POST'])
+@app.route("/upload", methods=["POST"])
 def upload_file():
-    global file_path
-    file = request.files.get('file')
-    if file:
-        file_path = os.path.join("uploads", file.filename)
-        file.save(file_path)
-        return jsonify({"status": "success", "message": f"File {file.filename} uploaded successfully."})
-    return jsonify({"status": "error", "message": "No file selected."})
+    if "file" not in request.files:
+        return jsonify({"status": "error", "message": "No file part in request."}), 400
 
-@app.route('/start', methods=['POST'])
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"status": "error", "message": "No file selected."}), 400
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        file.save(file_path)
+        return jsonify({"status": "success", "message": f"File {filename} uploaded successfully.", "file_path": file_path})
+    else:
+        return jsonify({"status": "error", "message": "Invalid file type. Only CSV allowed."}), 400
+
+@app.route("/start", methods=["POST"])
 def start_blasting():
     global sent_numbers, failed_numbers, last_sent_index, driver
 
-    if not file_path:
-        return jsonify({"status": "error", "message": "Please upload a file first."})
+    if not request.is_json:
+        return jsonify({"status": "error", "message": "Request must be in JSON format."}), 400
 
-    # Message template
-    message_template = request.json.get("message", "").strip()
+    request_data = request.get_json()
+    file_path = request_data.get("file_path")
+    message_template = request_data.get("message", "").strip()
+
+    if not file_path or not os.path.exists(file_path):
+        return jsonify({"status": "error", "message": "Uploaded file not found."}), 400
     if not message_template:
-        return jsonify({"status": "error", "message": "Message cannot be empty."})
+        return jsonify({"status": "error", "message": "Message cannot be empty."}), 400
 
     try:
         # Initialize WebDriver
@@ -99,9 +124,9 @@ def start_blasting():
     except Exception as e:
         if driver:
             driver.quit()
-        return jsonify({"status": "error", "message": str(e)})
+        return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route('/status', methods=['GET'])
+@app.route("/status", methods=["GET"])
 def get_status():
     return jsonify({
         "sent_numbers": sent_numbers,
@@ -109,10 +134,6 @@ def get_status():
         "last_sent_index": last_sent_index
     })
 
-def is_valid_number(nomor):
-    pattern = r'^\+62\d{8,15}$'
-    return re.match(pattern, nomor) is not None
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
