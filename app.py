@@ -106,8 +106,12 @@ def start_blasting():
         WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//div[@id='app']")))
 
         # Process CSV file
-        data = pd.read_csv(file_path, dtype={"NO HANDPHONE": str}).dropna(subset=["NO HANDPHONE"])
-        data["NO HANDPHONE"] = data["NO HANDPHONE"].apply(lambda x: x.strip())
+        try:
+            data = pd.read_csv(file_path, dtype={"NO HANDPHONE": str}).dropna(subset=["NO HANDPHONE"])
+            data["NO HANDPHONE"] = data["NO HANDPHONE"].apply(lambda x: x.strip())
+        except Exception as e:
+            logger.error(f"Error processing CSV file: {e}")
+            return jsonify({"status": "error", "message": "Error processing the uploaded CSV file."}), 400
 
         # Send messages to numbers
         for index, row in data.iloc[last_sent_index:].iterrows():
