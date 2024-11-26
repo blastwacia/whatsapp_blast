@@ -83,7 +83,9 @@ def start_blasting():
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--headless")
-        service = Service(executable_path="chromedriver")
+        
+        # Check if 'chromedriver' exists in path
+        service = Service(executable_path="/path/to/chromedriver")  # Provide absolute path if necessary
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
         # Load WhatsApp Web
@@ -113,10 +115,11 @@ def start_blasting():
                 tombol_kirim.click()
                 sent_numbers.append(nomor)
                 last_sent_index += 1
-            except Exception:
+            except Exception as e:
                 failed_numbers.append(nomor)
+                app.logger.error(f"Error sending to {nomor}: {str(e)}")
 
-            sleep(randint(90, 180))
+            sleep(randint(90, 180))  # Random sleep to avoid detection
 
         driver.quit()
         return jsonify({"status": "success", "message": "Blasting completed."})
@@ -124,6 +127,7 @@ def start_blasting():
     except Exception as e:
         if driver:
             driver.quit()
+        app.logger.error(f"Error during blasting process: {str(e)}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/status", methods=["GET"])
