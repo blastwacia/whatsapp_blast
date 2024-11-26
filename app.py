@@ -13,13 +13,17 @@ from time import sleep
 from random import randint
 import re
 from werkzeug.utils import secure_filename
+import logging
 
+# Initialize Flask app
 app = Flask(__name__)
 
-# Folder Upload
+# Folder Upload Configuration
 UPLOAD_FOLDER = "uploads"
 ALLOWED_EXTENSIONS = {"csv"}
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+# Ensure upload folder exists
 if not os.path.exists(UPLOAD_FOLDER):
     os.mkdir(UPLOAD_FOLDER)
 
@@ -29,7 +33,11 @@ failed_numbers = []
 last_sent_index = 0
 driver = None
 
-# Helpers
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+# Helper functions
 def allowed_file(filename):
     """Check if the file is a valid CSV."""
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -65,13 +73,16 @@ def upload_file():
 def start_blasting():
     global sent_numbers, failed_numbers, last_sent_index, driver
 
+    # Check if request is in JSON format
     if not request.is_json:
         return jsonify({"status": "error", "message": "Request must be in JSON format."}), 400
 
+    # Parse JSON data from request
     request_data = request.get_json()
     file_path = request_data.get("file_path")
     message_template = request_data.get("message", "").strip()
 
+    # Validate file path and message
     if not file_path or not os.path.exists(file_path):
         return jsonify({"status": "error", "message": "Uploaded file not found."}), 400
     if not message_template:
@@ -83,19 +94,22 @@ def start_blasting():
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--window-size=1920x1080")
         
-        # Check if 'chromedriver' exists in path
-        service = Service(executable_path="/path/to/chromedriver")  # Provide absolute path if necessary
+        # Path to chromedriver
+        service = Service(executable_path="chromedriver")  # Adjust this if necessary
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
         # Load WhatsApp Web
         driver.get("https://web.whatsapp.com")
         WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//div[@id='app']")))
 
-        # Process file
+        # Process CSV file
         data = pd.read_csv(file_path, dtype={"NO HANDPHONE": str}).dropna(subset=["NO HANDPHONE"])
         data["NO HANDPHONE"] = data["NO HANDPHONE"].apply(lambda x: x.strip())
 
+        # Send messages to numbers
         for index, row in data.iloc[last_sent_index:].iterrows():
             nomor = row["NO HANDPHONE"]
             if not is_valid_number(nomor):
@@ -109,6 +123,7 @@ def start_blasting():
                 driver.get(url)
                 sleep(5)
 
+                # Wait for the send button and click
                 tombol_kirim = WebDriverWait(driver, 30).until(
                     EC.element_to_be_clickable((By.XPATH, "//span[@data-icon='send']"))
                 )
@@ -117,17 +132,19 @@ def start_blasting():
                 last_sent_index += 1
             except Exception as e:
                 failed_numbers.append(nomor)
-                app.logger.error(f"Error sending to {nomor}: {str(e)}")
+                logger.error(f"Error sending to {nomor}: {str(e)}")
 
-            sleep(randint(90, 180))  # Random sleep to avoid detection
+            # Random sleep to avoid detection
+            sleep(randint(90, 180))
 
+        # Close WebDriver and complete process
         driver.quit()
         return jsonify({"status": "success", "message": "Blasting completed."})
 
     except Exception as e:
         if driver:
             driver.quit()
-        app.logger.error(f"Error during blasting process: {str(e)}")
+        logger.error(f"Error during blasting process: {str(e)}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/status", methods=["GET"])
